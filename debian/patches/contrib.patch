@@ -1,0 +1,29 @@
+Index: statsite-0.7.1/contrib/statsite.upstart.conf
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ statsite-0.7.1/contrib/statsite.upstart.conf	2015-09-14 19:02:58.693078794 +0000
+@@ -0,0 +1,24 @@
++# statsite - metrics aggregation server
++# https://github.com/armon/statsite
++description  "Statsite"
++
++start on runlevel [2345]
++stop on runlevel [!2345]
++
++respawn
++respawn limit 10 5
++
++setuid statsite
++setgid statsite
++
++pre-start script
++  . /etc/default/statsite
++  if [ ! -f /etc/statsite.conf ]; then
++    stop; exit 0
++  fi
++end script
++
++script
++  . /etc/default/statsite
++  exec /usr/bin/statsite -f /etc/statsite.conf >> /var/log/statsite.log 2>&1
++end script

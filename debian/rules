@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+DESTDIR=$$(pwd)/debian/statsite
+
+%:
+	dh $@
+
+override_dh_auto_test:
+
+override_dh_auto_install:
+	mkdir -p $(DESTDIR)/usr/bin
+	install statsite $(DESTDIR)/usr/bin/statsite
+
+	mkdir -p $(DESTDIR)/etc/init
+	cp contrib/statsite.upstart.conf $(DESTDIR)/etc/init/statsite.conf
+	touch $(DESTDIR)/etc/default/statsite
