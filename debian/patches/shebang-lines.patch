@@ -1,0 +1,20 @@
+Index: statsite-0.7.1/sinks/graphite.py
+===================================================================
+--- statsite-0.7.1.orig/sinks/graphite.py	2015-09-14 19:15:14.015496832 +0000
++++ statsite-0.7.1/sinks/graphite.py	2015-09-14 19:16:08.387496317 +0000
+@@ -1,3 +1,5 @@
++#!/usr/bin/python
++
+ """
+ Supports flushing metrics to graphite
+ """
+Index: statsite-0.7.1/sinks/influxdb.py
+===================================================================
+--- statsite-0.7.1.orig/sinks/influxdb.py	2015-09-14 19:16:42.175495998 +0000
++++ statsite-0.7.1/sinks/influxdb.py	2015-09-14 19:16:49.115495932 +0000
+@@ -1,3 +1,5 @@
++#!/usr/bin/python
++
+ """
+ Supports flushing statsite metrics to InfluxDB
+ """

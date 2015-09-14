@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+. /usr/share/debconf/confmodule
+
+case "$1" in
+  configure)
+    addgroup --system statsite
+    adduser --system statsite --ingroup statsite --shell /bin/bash --home /var/lib/statsite
+    if [ -e /etc/statsite.conf ]; then
+      chown statsite:statsite /etc/statsite.conf
+    fi
+  ;;
+
+  abort-*)
+    exit 0
+  ;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+  ;;
+esac
+
+#DEBHELPER#
+
+exit 0

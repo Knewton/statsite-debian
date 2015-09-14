@@ -1,0 +1,111 @@
+#!/bin/bash
+set -e
+
+### BEGIN INIT INFO
+# Provides:           statsite
+# Required-Start:     $syslog $remote_fs
+# Required-Stop:      $syslog $remote_fs
+# Default-Start:      2 3 4 5
+# Default-Stop:       0 1 6
+# Short-Description:  C implementation of statsd https://armon.github.io/statsite
+# Description:
+#  Statsite is a metrics aggregation server. Statsite is based heavily on Etsy's
+#  StatsD https://github.com/etsy/statsd, and is wire compatible.
+### END INIT INFO
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+
+STATSITE=/usr/bin/statsite
+STATSITE_CONFFILE=/etc/statsite.conf
+STATSITE_PIDFILE=/var/run/statsite.pid
+STATSITE_LOGFILE=/var/log/statsite.pid
+STATSITE_OPTS=
+
+. /lib/lsb/init-functions
+
+if [ -f /etc/default/statsite ]; then
+  . /etc/default/statsite
+fi
+
+if [ ! -x $STATSITE ]; then
+  log_failure_msg "$STATSITE not present or not executable"
+  exit 1
+fi
+
+check_init() {
+  if init_is_upstart; then
+    log_failure_msg "Statsite is managed via upstart, try using service statsite $1"
+    exit 1
+  fi
+}
+
+require_config() {
+  if [ ! -e "$STATSITE_CONFFILE" ]; then
+    log_failure_msg "$STATSITE_CONFFILE not present, will not $1"
+    exit 0
+  fi
+}
+
+fail_unless_root() {
+  if [ "$(id -u)" != '0' ]; then
+    log_failure_msg "Statsite init must be run as root"
+    exit 1
+  fi
+}
+
+case "$1" in
+  start)
+    check_init
+    fail_unless_root
+    require_config
+
+    touch "$DOCKER_LOGFILE"
+    chown statsite:statsite "$DOCKER_LOGFILE"
+
+    log_begin_msg "Starting Statsite:"
+    start-stop-daemon --start --background \
+      --exec "$STATSITE" \
+      --pidfile "$DOCKER_PIDFILE" \
+      --make-pidfile \
+      -c statsite:statsite \
+      -- \
+        -f "$STATSITE_CONFFILE" \
+        $STATSITE_OPTS \
+          >> "$STATSITE_LOGFILE" 2>&1
+    log_end_msg $?
+    ;;
+
+  stop)
+    check_init
+    fail_unless_root
+    log_begin_msg "Stopping Statsite:"
+    start-stop-daemon --stop --pidfile "$STATSITE_PIDFILE"
+    log_end_msg $?
+    ;;
+
+  restart)
+    check_init
+    fail_unless_root
+    statsite_pid=`cat "$STATSITE_PIDFILE" 2>/dev/null`
+    [ -n "$statsite_pid" ] \
+      && ps -p $statsite_pid > /dev/null 2>&1 \
+      && $0 stop
+    $0 start
+    ;;
+
+  status)
+    check_init
+    status_of_proc -p "$DOCKER_PIDFILE" "$STATSITE" Statsite
+    ;;
+
+  force-reload)
+    check_init
+    fail_unless_root
+    $0 restart
+    ;;
+
+  *)
+    echo "Usage: service statsite {start|stop|restart|status}"
+    exit 1
+    ;;
+esac

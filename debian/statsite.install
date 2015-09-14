@@ -1,0 +1,3 @@
+statsite usr/bin
+sinks/graphite.py usr/share/statsite/sinks
+sinks/influxdb.py usr/share/statsite/sinks

@@ -10,6 +10,6 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "shell", inline: <<-EOF
 apt-get update
-apt-get install -y build-essential devscripts debhelper scons
+apt-get install -y build-essential devscripts debhelper scons quilt
   EOF
 end

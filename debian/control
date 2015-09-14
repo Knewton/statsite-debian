@@ -3,11 +3,12 @@ Maintainer: Jonathan A. Sternberg <jonathan.sternberg@knewton.com>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.5
-Build-Depends: debhelper (>= 9), scons
+Build-Depends: debhelper (>= 9), scons, python
 
 Package: statsite
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: adduser, ${shlibs:Depends}, ${misc:Depends}
+Recommends: ${python:Depends}
 Description: C implementation of statsd https://armon.github.io/statsite
  Statsite is a metrics aggregation server. Statsite is based heavily on Etsy's
  StatsD https://github.com/etsy/statsd, and is wire compatible.

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+. /usr/share/debconf/confmodule
+
+if [ "$1" = purge ]; then
+  update-rc.d statsite remove
+fi
+
+#DEBHELPER#
+
+exit 0

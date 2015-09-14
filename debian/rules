@@ -1,16 +1,15 @@
 #!/usr/bin/make -f
 
 DESTDIR=$$(pwd)/debian/statsite
+SINKS=sinks/graphite.py sinks/influxdb.py
 
 %:
 	dh $@
 
 override_dh_auto_test:
 
-override_dh_auto_install:
-	mkdir -p $(DESTDIR)/usr/bin
-	install statsite $(DESTDIR)/usr/bin/statsite
+override_dh_shlibdeps:
+	dh_shlibdeps
+	dh_python2
 
-	mkdir -p $(DESTDIR)/etc/init
-	cp contrib/statsite.upstart.conf $(DESTDIR)/etc/init/statsite.conf
-	touch $(DESTDIR)/etc/default/statsite
+.PHONY: override_dh_auto_test override_dh_shlibdeps

@@ -1,0 +1,27 @@
+# statsite - metrics aggregation server
+# https://github.com/armon/statsite
+description  "Statsite"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit 10 5
+
+setgid statsite
+
+pre-start script
+  if [ ! -e /etc/statsite.conf ]; then
+    echo "/etc/statsite.conf not present, will not start"
+    stop; exit 0
+  fi
+end script
+
+script
+  if [ -e /etc/default/statsite ]; then
+    . /etc/default/statsite
+  fi
+  touch /var/log/statsite.log
+  chown statsite:statsite /var/log/statsite.log
+  exec su -c "/usr/bin/statsite -f /etc/statsite.conf &> /var/log/statsite.log" statsite
+end script
